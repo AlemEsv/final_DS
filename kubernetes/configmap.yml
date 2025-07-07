@@ -4,7 +4,6 @@ metadata:
   name: microservice-config
 data:
   API_KEY: "microservice-key-12345"
-  LEGACY_APP_URL: "http://apps-service:5000"
 
 ---
 apiVersion: v1

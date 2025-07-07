@@ -1,23 +1,46 @@
+# Deployment que contiene ambas aplicaciones en el mismo pod
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: new-microservice
+  name: aplicacion
   labels:
-    app: unified-apps
-    component: microservice
+    app: aplicacion
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: unified-apps
-      component: microservice
+      app: aplicacion
   template:
     metadata:
       labels:
-        app: unified-apps
-        component: microservice
+        app: aplicacion
     spec:
       containers:
+      # Contenedor de la aplicación legacy
+      - name: app-legacy
+        image: final_ds-app-legacy:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_DB
+      # Contenedor del microservicio
       - name: new-microservice
         image: final_ds-new-microservice:latest
         imagePullPolicy: Never
@@ -47,7 +70,4 @@ spec:
               name: microservice-config
               key: API_KEY
         - name: LEGACY_APP_URL
-          valueFrom:
-            configMapKeyRef:
-              name: microservice-config
-              key: LEGACY_APP_URL
+          value: "http://localhost:5000"  # Misma instancia de pod
