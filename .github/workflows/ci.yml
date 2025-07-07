@@ -39,9 +39,23 @@ jobs:
     
     # 4) Aplicar manifiestos validos
     - name: Aplicar manifiestos
-      run: kubectl apply -f kubernetes/
+      run: 
+        kubectl apply -f kubernetes/deployment.yml
+        kubectl apply -f kubernetes/configmap.yml
+        kubectl apply -f kubernetes/network-policy.yml
+        kubectl apply -f kubernetes/secrets.yml
+        kubectl apply -f kubernetes/service.yml
+        kubectl apply -f kubernetes/statefulset.yaml
 
-    # 5) Verificar servicio
+    # 5) Verificar secretos y politicas creadas
+    - name: Verificar secretos
+      run: |
+        kubectl get secrets app-secret -o yaml
+
+    - name: Verificar políticas creadas
+      run: |
+        kubectl get networkpolicy
+        kubectl describe networkpolicy python-flask-policy 
     
     # 6) Limpiar estado
     - name: Cleanup
