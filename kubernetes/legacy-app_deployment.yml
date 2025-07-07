@@ -5,16 +5,19 @@ kind: Deployment
 metadata:
   name: app-legacy
   labels:
-    app: app-legacy
+    app: apps
+    component: legacy
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: app-legacy
+      app: apps
+      component: legacy
   template:
     metadata:
       labels:
-        app: app-legacy
+        app: apps
+        component: legacy
     spec:
       containers:
       - name: app-legacy
@@ -40,17 +43,3 @@ spec:
             secretKeyRef:
               name: db-credentials
               key: POSTGRES_DB
----
-
-# Servicio donde se desplegará la aplicación legacy
-apiVersion: v1
-kind: Service
-metadata:
-  name: app-legacy-service
-spec:
-  selector:
-    app: app-legacy
-  ports:
-    - port: 5000
-      targetPort: 5000
-  type: ClusterIP

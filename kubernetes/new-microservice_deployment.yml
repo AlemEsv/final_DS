@@ -3,16 +3,19 @@ kind: Deployment
 metadata:
   name: new-microservice
   labels:
-    app: new-microservice
+    app: unified-apps
+    component: microservice
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: new-microservice
+      app: unified-apps
+      component: microservice
   template:
     metadata:
       labels:
-        app: new-microservice
+        app: unified-apps
+        component: microservice
     spec:
       containers:
       - name: new-microservice
@@ -48,15 +51,3 @@ spec:
             configMapKeyRef:
               name: microservice-config
               key: LEGACY_APP_URL
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: new-microservice-service
-spec:
-  selector:
-    app: new-microservice
-  ports:
-    - port: 5001
-      targetPort: 5001
-  type: ClusterIP
