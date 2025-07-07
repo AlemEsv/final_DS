@@ -2,23 +2,23 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: apps-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
       paths:
+      # Ruta para la aplicación legacy
       - path: /app
         pathType: Prefix
         backend:
           service:
             name: apps-service
             port:
-              number: 5000  # Puerto de la aplicación legacy
+              number: 5000
+      # Ruta para el microservicio
       - path: /api
         pathType: Prefix
         backend:
           service:
             name: apps-service
             port:
-              number: 5001  # Puerto del microservicio
+              number: 5001

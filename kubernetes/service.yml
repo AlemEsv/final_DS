@@ -5,7 +5,7 @@ metadata:
   name: apps-service
 spec:
   selector:
-    app: apps
+    app: aplicacion
   ports:
     - name: legacy-port
       port: 5000
