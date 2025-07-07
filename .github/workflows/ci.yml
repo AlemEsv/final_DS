@@ -33,21 +33,38 @@ jobs:
     - name: Construir contenedores
       run: docker compose build
     
-    # 3) Habilitar Politica de ingreso en minikube
+    # 4) Habilitar Politica de ingreso en minikube
     - name: Habilitar Ingress
       run: minikube addons enable ingress
     
-    # 4) Aplicar manifiestos validos
-    - name: Aplicar manifiestos
-      run: 
-        kubectl apply -f kubernetes/deployment.yml
+    # 5) Esperar a que el controlador de Ingress esté listo
+    - name: Esperar controlador de Ingress
+      run: |
+        kubectl wait --namespace ingress-nginx \
+          --for=condition=ready pod \
+          --selector=app.kubernetes.io/component=controller \
+          --timeout=300s
+    
+    # 6) Aplicar manifiestos validos 
+    - name: Aplicar manifiestos base
+      run: |
         kubectl apply -f kubernetes/configmap.yml
-        kubectl apply -f kubernetes/network-policy.yml
         kubectl apply -f kubernetes/secrets.yml
-        kubectl apply -f kubernetes/service.yml
         kubectl apply -f kubernetes/statefulset.yaml
+        kubectl apply -f kubernetes/deployment.yml
+        kubectl apply -f kubernetes/service.yml
+    
+    # 7) Esperar a que los servicios estén listos
+    - name: Esperar servicios
+      run: |
+        kubectl wait --for=condition=available deployment/aplicacion --timeout=300s
+        kubectl wait --for=condition=ready pod -l app=postgres --timeout=300s
+    
+    # 8) Aplicar manifiesto de ingreso
+    - name: Aplicar Ingress
+      run: kubectl apply -f kubernetes/ingress.yml
 
-    # 5) Verificar secretos y politicas creadas
+    # 9) Verificar secretos y politicas creadas
     - name: Verificar secretos
       run: |
         kubectl get secrets app-secret -o yaml
@@ -57,7 +74,7 @@ jobs:
         kubectl get networkpolicy
         kubectl describe networkpolicy python-flask-policy 
     
-    # 6) Limpiar estado
+    # 10) Limpiar estado
     - name: Cleanup
       run: kubectl delete -f kubernetes/
 
