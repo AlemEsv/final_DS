@@ -1,0 +1,61 @@
+services:
+
+  # contenedor postgreSQL que verifica disponibilidad con pg_isready
+  postgres:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # contenedor de la aplicación monolitica
+  app-legacy:
+    build:
+      context: ./app-legacy
+      dockerfile: dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../initdb:/initdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # contenedor del microservicio
+  new-microservice:
+    build:
+      context: ./new-microservice
+      dockerfile: dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
+    ports:
+      - "5001:5000"
+    volumes:
+      - ../initdb:/initdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
