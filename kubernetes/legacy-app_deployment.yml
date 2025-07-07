@@ -1,0 +1,56 @@
+# archivo de despliegue para la aplicación legacy
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-legacy
+  labels:
+    app: app-legacy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-legacy
+  template:
+    metadata:
+      labels:
+        app: app-legacy
+    spec:
+      containers:
+      - name: app-legacy
+        image: final_ds-app-legacy:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: POSTGRES_DB
+---
+
+# Servicio donde se desplegará la aplicación legacy
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-legacy-service
+spec:
+  selector:
+    app: app-legacy
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP
