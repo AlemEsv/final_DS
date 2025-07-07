@@ -31,7 +31,7 @@ jobs:
     
     # 3) Construcción de contenedores con docker-compose
     - name: Construir contenedores
-      run: docker-compose build
+      run: docker compose build
     
     # 3) Habilitar Politica de ingreso en minikube
     - name: Habilitar Ingress
