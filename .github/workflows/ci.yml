@@ -20,7 +20,7 @@ jobs:
         sudo mv kubeconform /usr/local/bin/
 
     - name: Validar manifiestos
-      run: kubeconform manifests/
+      run: kubeconform kubernetes/
 
     # 2) Iniciar cluster de kubernetes local
     - name: Iniciar minikube
