@@ -1,0 +1,28 @@
+# Etapa inicial: instalar dependencias
+FROM python:3.9-slim AS builder
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+# Instala dependencias 
+RUN pip install --target=/app/packages --no-cache-dir -r requirements.txt
+
+# Etapa final: Copiar archivos necesarios
+FROM python:3.9-slim AS production
+
+WORKDIR /app
+
+# Copia dependencias instaladas desde la etapa inicial
+COPY --from=builder /app/packages /app/packages
+
+# Copia el código fuente de la aplicación legacy
+COPY app.py .
+
+# Puerto donde se expondrá la imagen final
+EXPOSE 5000
+
+# Establecer la variable de entorno para Python path
+ENV PYTHONPATH=/app/packages
+
+CMD ["python", "app.py"]
