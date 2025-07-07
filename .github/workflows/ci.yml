@@ -41,7 +41,7 @@ jobs:
     - name: Aplicar manifiestos
       run: kubectl apply -f kubernetes/
 
-    # 5) Verificar servicios
+    # 5) Verificar servicio
     
     # 6) Limpiar estado
     - name: Cleanup
