@@ -23,6 +23,7 @@ def get_db_connection():
             time.sleep(5)
     raise Exception("No se pudo conectar a la base de datos")
 
+@app.route('/')
 @app.route('/app')
 def home():
     return jsonify({
