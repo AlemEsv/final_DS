@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 1) Validación estática
+    - name: Instalar kubeconform
+      run: |
+        curl -L https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
+        tar -xzvf kubeconform.tar.gz
+        sudo mv kubeconform /usr/local/bin/
+
+    - name: Validar manifiestos
+      run: kubeconform manifests/
+
+    # 2) Iniciar cluster de kubernetes local
+    - name: Iniciar minikube
+      uses: medyagh/setup-minikube@master
+      with:
+        minikube-version: 1.36.0
+        kubernetes-version: 1.28.3
+    
+    # 3) Habilitar Politica de ingreso en minikube
+    - name: Habilitar Ingress
+      run: minikube addons enable ingress
+    
+    # 4) Aplicar manifiestos validos
+    - name: Aplicar manifiestos
+      run: kubectl apply -f kubernetes/
+
+    # 5) Verificar servicios
+    
+    # 6) Limpiar estado
+    - name: Cleanup
+      run: kubectl delete -f kubernetes/
+
