@@ -1,0 +1,22 @@
+# Política de red para controlar el tráfico de entrada
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: apps-policy
+  labels:
+    app: aplicacion
+spec:
+  # Selecciona los pods que tendrán esta política aplicada
+  podSelector:
+    matchLabels:
+      app: aplicacion
+  
+  # Tipos de políticas a aplicar
+  policyTypes:
+  - Ingress
+  
+  # Reglas de tráfico de entrada
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 5000  # Conexión permitida
