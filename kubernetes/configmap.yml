@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservice-config
+data:
+  API_KEY: "microservice-key-12345"
+  LEGACY_APP_URL: "http://app-legacy-service:5000"
