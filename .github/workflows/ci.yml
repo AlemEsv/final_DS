@@ -54,17 +54,11 @@ jobs:
         kubectl apply -f kubernetes/deployment.yml
         kubectl apply -f kubernetes/service.yml
     
-    # 7) Esperar a que los servicios estén listos
-    - name: Esperar servicios
-      run: |
-        kubectl wait --for=condition=available deployment/aplicacion --timeout=300s
-        kubectl wait --for=condition=ready pod -l app=postgres --timeout=300s
-    
-    # 8) Aplicar manifiesto de ingreso
+    # 7) Aplicar manifiesto de ingreso
     - name: Aplicar Ingress
       run: kubectl apply -f kubernetes/ingress.yml
 
-    # 9) Verificar secretos y politicas creadas
+    # 8) Verificar secretos y politicas creadas
     - name: Verificar secretos
       run: |
         kubectl get secrets app-secret -o yaml
@@ -74,7 +68,7 @@ jobs:
         kubectl get networkpolicy
         kubectl describe networkpolicy python-flask-policy 
     
-    # 10) Limpiar estado
+    # 9) Limpiar estado
     - name: Cleanup
       run: kubectl delete -f kubernetes/
 
