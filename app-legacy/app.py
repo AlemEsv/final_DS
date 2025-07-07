@@ -23,7 +23,7 @@ def get_db_connection():
             time.sleep(5)
     raise Exception("No se pudo conectar a la base de datos")
 
-@app.route('/')
+@app.route('/app')
 def home():
     return jsonify({
         "service": "app-legacy",
@@ -31,7 +31,7 @@ def home():
         "message": "Aplicacion legacy funcionando"
     })
 
-@app.route('/users')
+@app.route('/app/users')
 def get_users():
     """Obtener todos los usuarios"""
     try:
@@ -67,7 +67,7 @@ def get_users():
         return jsonify({"error": str(e)}), 500
     
 # Verificar estado del servicio desplegado
-@app.route('/health')
+@app.route('/app/health')
 def health():
     return jsonify({"status": "healthy", "service": "app-legacy"})
 
